@@ -29,14 +29,17 @@ const uploads = require('./api/uploads');
 const StorageService = require('./services/S3/StorageService');
 const UploadsValidator = require('./validator/uploads');
 
+const CacheService = require('./services/redis/CacheService');
+
 const ClientError = require('./exceptions/ClientError');
 
 const envFile = process.env.NODE_ENV === 'production' ? '.prod.env' : '.env';
 dotenv.config({ path: envFile });
 
 const init = async () => {
-  const collaborationsService = new CollaborationsService();
-  const notesService = new NotesService(collaborationsService);
+  const cacheService = new CacheService;
+  const collaborationsService = new CollaborationsService(cacheService);
+  const notesService = new NotesService(collaborationsService, cacheService);
   const usersService = new UsersService();
   const authenticationsService = new AuthenticationsService();
   const storageService = new StorageService();
